@@ -33,7 +33,7 @@ function ShowPage() {
       <button>
         {/* <a href="/add">Add data</a> */}
         <Link to="/add" style={{ textDecoration: "none", color: "inherit" }}>
-          Add data
+          Add data more
         </Link>
       </button>
       <br />
