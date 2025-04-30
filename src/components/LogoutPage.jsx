@@ -24,7 +24,6 @@ function LogoutPage() {
   return (
     <div>
       <h2>Logging out...</h2>
-      <h2>Logging out...</h2>
     </div>
   );
 }

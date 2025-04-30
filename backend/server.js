@@ -2,8 +2,17 @@
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
+import rateLimit from 'express-rate-limit';
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc } from "firebase/firestore";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+  doc,
+  updateDoc,
+  deleteDoc,
+} from "firebase/firestore";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -14,9 +23,8 @@ const firebaseConfig = {
   storageBucket: "testapi-fd352.appspot.com",
   messagingSenderId: "223425154735",
   appId: "1:223425154735:web:f916d99c5630b692a2ce5a",
-  measurementId: "G-W7YBKLYGQ3"
+  measurementId: "G-W7YBKLYGQ3",
 };
-
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
@@ -26,13 +34,44 @@ const db = getFirestore(app);
 const serverApp = express();
 const PORT = 3001;
 
-serverApp.use(cors());
+serverApp.use(
+  cors({
+    origin: "http://localhost:5173",
+  })
+);
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100,
+  message: "Too many requests, please try again later."
+});
+ serverApp.use(limiter);
 serverApp.use(bodyParser.json());
 
-// 🔹 CREATE
+// // 🔹 CREATE
+// serverApp.post("/tasks", async (req, res) => {
+//   try {
+//     const data = req.body;
+//     const docRef = await addDoc(collection(db, "tasks"), data);
+//     res.status(201).send({ id: docRef.id });
+//   } catch (error) {
+//     res.status(500).send(error.message);
+//   }
+// });
 serverApp.post("/tasks", async (req, res) => {
+  const { title, type, ແຮງມາ: strength, ລາຍລະອຽດ: description } = req.body;
+
+  if (!title || !type) {
+    return res.status(400).send("All fields are required");
+  }
+
+  const data = {
+    title: String(title),
+    type: String(type),
+    ແຮງມາ: strength ? String(strength) : "",
+    ລາຍລະອຽດ: description ? String(description) : "",
+  };
+
   try {
-    const data = req.body;
     const docRef = await addDoc(collection(db, "tasks"), data);
     res.status(201).send({ id: docRef.id });
   } catch (error) {
